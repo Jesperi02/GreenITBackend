@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GreenITASPNetCore.Models
 {
@@ -9,7 +10,9 @@ namespace GreenITASPNetCore.Models
         [Required]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "{0} length must be between {2} and {1}")]
         public string Name { get; set; } = String.Empty;
-        public IActionResult? File { get; set; }
+        [NotMapped]
+        public IFormFile? File { get; set; }
+        public string Filename { get; set; } = String.Empty;
     }
 
     public class TextFileDTO
@@ -18,6 +21,6 @@ namespace GreenITASPNetCore.Models
         [Required]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "{0} length must be between {2} and {1}")]
         public string Name { get; set; } = String.Empty;
-        public string File { get; set; } = String.Empty;
+        public string Filename { get; set; } = String.Empty;
     }
 }
