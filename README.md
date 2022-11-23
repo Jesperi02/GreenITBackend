@@ -1,2 +1,2 @@
 # GreenIT
-Vue and backend
+Backend for the Green-IT course project
