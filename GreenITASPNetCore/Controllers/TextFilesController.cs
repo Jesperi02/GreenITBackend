@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GreenITASPNetCore.Models;
+using GreenITASPNetCore.Services;
 
 namespace GreenITASPNetCore.Controllers
 {
@@ -13,95 +14,81 @@ namespace GreenITASPNetCore.Controllers
     [ApiController]
     public class TextFilesController : ControllerBase
     {
-        private readonly FileContext _context;
+        private readonly IFileService _fileService;
 
-        public TextFilesController(FileContext context)
+        public TextFilesController(IFileService fileService)
         {
-            _context = context;
+            _fileService = fileService;
         }
 
         // GET: api/TextFiles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TextFile>>> GetTextFiles()
         {
-            return await _context.TextFiles.ToListAsync();
+            return Ok(await _fileService.GetFilesAsync());
         }
 
         // GET: api/TextFiles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TextFile>> GetTextFile(long id)
         {
-            var textFile = await _context.TextFiles.FindAsync(id);
+            TextFileDTO textFileDTO = await _fileService.GetFileAsync(id);
 
-            if (textFile == null)
+            if (textFileDTO == null)
             {
                 return NotFound();
             }
 
-            return textFile;
+            return Ok(textFileDTO);
         }
 
         // PUT: api/TextFiles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTextFile(long id, TextFile textFile)
+        public async Task<IActionResult> PutTextFile(long id, TextFileDTO textFileDTO)
         {
-            if (id != textFile.Id)
+            if (id != textFileDTO.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(textFile).State = EntityState.Modified;
+            TextFileDTO updatedFile = await _fileService.UpdateFileAsync(textFileDTO);
 
-            try
+            if (updatedFile == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TextFileExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Problem();
             }
 
-            return NoContent();
+            return Ok(updatedFile);
         }
 
         // POST: api/TextFiles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<TextFile>> PostTextFile(TextFile textFile)
+        public async Task<ActionResult<TextFile>> PostTextFile(TextFileDTO textFileDTO)
         {
-            _context.TextFiles.Add(textFile);
-            await _context.SaveChangesAsync();
+            TextFileDTO newDTO = await _fileService.CreateFileAsync(textFileDTO);
 
-            return CreatedAtAction("GetTextFile", new { id = textFile.Id }, textFile);
+            if (newDTO == null)
+            {
+                return Problem();
+            }
+
+            return CreatedAtAction("GetItem", new { id = newDTO.Id }, newDTO);
         }
 
         // DELETE: api/TextFiles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTextFile(long id)
         {
-            var textFile = await _context.TextFiles.FindAsync(id);
-            if (textFile == null)
+            bool deleted = await _fileService.DeleteFileAsync(id);
+
+            if (deleted)
             {
-                return NotFound();
+                return Ok();
             }
 
-            _context.TextFiles.Remove(textFile);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TextFileExists(long id)
-        {
-            return _context.TextFiles.Any(e => e.Id == id);
+            return NotFound();
         }
     }
 }

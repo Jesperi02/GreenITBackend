@@ -1,5 +1,6 @@
 ﻿using GreenITASPNetCore.Models;
 using GreenITASPNetCore.Repositories;
+using System.Globalization;
 
 namespace GreenITASPNetCore.Services
 {
@@ -12,29 +13,77 @@ namespace GreenITASPNetCore.Services
             _fileRepository = fileRepository;
         }
 
-        public Task<TextFileDTO> CreateFileAsync(TextFileDTO dto)
+        public async Task<TextFileDTO> CreateFileAsync(TextFileDTO dto)
         {
-            throw new NotImplementedException();
+            TextFile textFile = await DTOToFile(dto);
+            TextFile updatedFile = await _fileRepository.AddFileAsync(textFile);
+
+            if (updatedFile == null)
+            {
+                return null;
+            }
+
+            return FileToDTO(updatedFile);
         }
 
-        public Task<bool> DeleteFileAsync(TextFileDTO dto)
+        public async Task<bool> DeleteFileAsync(long id)
         {
-            throw new NotImplementedException();
+            TextFile file = await _fileRepository.GetFileAsync(id);
+
+            if (file == null)
+            {
+                return false;
+            }
+
+            return await _fileRepository.DeleteFileAsync(file);
         }
 
-        public Task<TextFileDTO> GetFileAsync(long id)
+        public async Task<TextFileDTO> GetFileAsync(long id)
         {
-            throw new NotImplementedException();
+            TextFile file = await _fileRepository.GetFileAsync(id);
+
+            if (file == null)
+            {
+                return null;
+            }
+
+            return FileToDTO(file);
         }
 
-        public Task<IEnumerable<TextFileDTO>> GetFilesAsync()
+        public async Task<IEnumerable<TextFileDTO>> GetFilesAsync()
         {
-            throw new NotImplementedException();
+            IEnumerable<TextFile> fileList = await _fileRepository.GetFilesAsync();
+            List<TextFileDTO> fileDTOList = new List<TextFileDTO>();
+
+            foreach (TextFile file in fileList)
+            {
+                fileDTOList.Add(FileToDTO(file));
+            }
+
+            return fileDTOList;
         }
 
-        public Task<TextFileDTO> UpdateFileAsync(TextFileDTO dto)
+        public async Task<TextFileDTO> UpdateFileAsync(TextFileDTO dto)
         {
-            throw new NotImplementedException();
+            TextFile file = await _fileRepository.GetFileAsync(dto.Id);
+
+            if (file == null)
+            {
+                return null;
+            }
+
+            file.Name = dto.Name;
+            file.Filename = dto.Filename;
+
+
+            TextFile updatedFile = await _fileRepository.UpdateFileAsync(file);
+
+            if (updatedFile == null)
+            {
+                return null;
+            }
+
+            return FileToDTO(updatedFile);
         }
 
         private TextFileDTO FileToDTO(TextFile file)
@@ -43,6 +92,8 @@ namespace GreenITASPNetCore.Services
             dto.Id = file.Id;
             dto.Name = file.Name;
             dto.Filename = file.Filename;
+
+            // add file data here
 
             return dto;
         }
@@ -53,12 +104,6 @@ namespace GreenITASPNetCore.Services
             file.Id = dto.Id;
             file.Name = dto.Name;
             file.Filename = dto.Filename;
-
-            // hae tiedosto
-            if (file.Filename != String.Empty)
-            {
-                file.File = null;
-            }
 
             return file;
         }

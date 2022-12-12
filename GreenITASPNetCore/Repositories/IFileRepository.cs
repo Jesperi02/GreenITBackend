@@ -4,10 +4,10 @@ namespace GreenITASPNetCore.Repositories
 {
     public interface IFileRepository
     {
-        public Task<TextFile> GetFileASync(long id);
-        public Task<IEnumerable<TextFile>> GetTextFilesAsync();
-        public Task<TextFile> AddItemAsync(TextFile file);
-        public Task<TextFile> UpdateItemAsync(TextFile file);
-        public Task<Boolean> DeleteItemAsync(long id);
+        public Task<TextFile> GetFileAsync(long id);
+        public Task<IEnumerable<TextFile>> GetFilesAsync();
+        public Task<TextFile> AddFileAsync(TextFile file);
+        public Task<TextFile> UpdateFileAsync(TextFile file);
+        public Task<Boolean> DeleteFileAsync(TextFile file);
     }
 }

@@ -10,8 +10,6 @@ namespace GreenITASPNetCore.Models
         [Required]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "{0} length must be between {2} and {1}")]
         public string Name { get; set; } = String.Empty;
-        [NotMapped]
-        public IFormFile? File { get; set; }
         public string Filename { get; set; } = String.Empty;
     }
 
@@ -22,5 +20,6 @@ namespace GreenITASPNetCore.Models
         [StringLength(50, MinimumLength = 3, ErrorMessage = "{0} length must be between {2} and {1}")]
         public string Name { get; set; } = String.Empty;
         public string Filename { get; set; } = String.Empty;
+        public string? File { get; set; } = String.Empty;
     }
 }

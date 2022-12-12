@@ -11,7 +11,7 @@ namespace GreenITASPNetCore.Repositories
         {
             _fileContext = fileContext;
         }
-        public async Task<TextFile> AddItemAsync(TextFile file)
+        public async Task<TextFile> AddFileAsync(TextFile file)
         {
             _fileContext.TextFiles.Add(file);
 
@@ -27,12 +27,23 @@ namespace GreenITASPNetCore.Repositories
             return file;
         }
 
-        public async Task<bool> DeleteItemAsync(long id)
+        public async Task<bool> DeleteFileAsync(TextFile file)
         {
-            throw new NotImplementedException();
+            _fileContext.TextFiles.Remove(file);
+
+            try
+            {
+                await _fileContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        public async Task<TextFile> GetFileASync(long id)
+        public async Task<TextFile> GetFileAsync(long id)
         {
             TextFile file = await _fileContext.TextFiles.Where(x =>
                 x.Id == id
@@ -41,14 +52,25 @@ namespace GreenITASPNetCore.Repositories
             return file;
         }
 
-        public async Task<IEnumerable<TextFile>> GetTextFilesAsync()
+        public async Task<IEnumerable<TextFile>> GetFilesAsync()
         {
-            throw new NotImplementedException();
+            return await _fileContext.TextFiles.ToListAsync();
         }
 
-        public async Task<TextFile> UpdateItemAsync(TextFile file)
+        public async Task<TextFile> UpdateFileAsync(TextFile file)
         {
-            throw new NotImplementedException();
+            _fileContext.Entry(file).State = EntityState.Modified;
+
+            try
+            {
+                await _fileContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return null;
+            }
+
+            return file;
         }
     }
 }

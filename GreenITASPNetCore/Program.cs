@@ -1,4 +1,6 @@
 using GreenITASPNetCore.Models;
+using GreenITASPNetCore.Repositories;
+using GreenITASPNetCore.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IFileRepository, FileRepository>();
 
 builder.Services.AddDbContext<FileContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("GreenDB"))
