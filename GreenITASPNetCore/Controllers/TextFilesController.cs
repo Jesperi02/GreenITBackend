@@ -25,7 +25,8 @@ namespace GreenITASPNetCore.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TextFile>>> GetTextFiles()
         {
-            return Ok(await _fileService.GetFilesAsync());
+            IEnumerable<TextFileDTO> response = await _fileService.GetFilesAsync();
+            return Ok(response);
         }
 
         // GET: api/TextFiles/5
@@ -74,7 +75,8 @@ namespace GreenITASPNetCore.Controllers
                 return Problem();
             }
 
-            return CreatedAtAction("GetItem", new { id = newDTO.Id }, newDTO);
+            return Ok(newDTO);
+            //return CreatedAtAction("GetItem", new { id = newDTO.Id }, newDTO);
         }
 
         // DELETE: api/TextFiles/5

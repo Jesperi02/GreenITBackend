@@ -1,7 +1,9 @@
 using GreenITASPNetCore.Models;
 using GreenITASPNetCore.Repositories;
 using GreenITASPNetCore.Services;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,18 @@ builder.Services.AddDbContext<FileContext>(opt =>
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+});
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Optimal;
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -27,6 +41,16 @@ using (var scope = app.Services.CreateScope())
     dbcontext.Database.EnsureCreated();
 
 }
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+    context.Response.Headers.Add("x-test", "*");
+    context.Response.Headers.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+    context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

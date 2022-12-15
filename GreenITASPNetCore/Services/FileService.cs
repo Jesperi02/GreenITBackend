@@ -95,6 +95,16 @@ namespace GreenITASPNetCore.Services
 
             // add file data here
 
+            if (dto.Filename != null)
+            {
+                // Example #1
+                // Read the file as one string.
+                string loc = @"C:\Users\user\OneDrive - LUT University\Green IT\Test data\";
+                loc += file.Filename;
+                string text = System.IO.File.ReadAllText(loc);
+                dto.File = text;
+            }
+
             return dto;
         }
 
